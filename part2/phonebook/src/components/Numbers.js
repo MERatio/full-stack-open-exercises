@@ -1,10 +1,14 @@
 import NumberItem from './NumberItem';
 
-const Numbers = ({ persons }) => {
+const Numbers = ({ persons, onDeletePerson }) => {
 	return (
 		<div>
 			{persons.map((person) => (
-				<NumberItem key={person.id} person={person} />
+				<NumberItem
+					key={person.id}
+					person={person}
+					onDeletePerson={onDeletePerson}
+				/>
 			))}
 		</div>
 	);
