@@ -38,55 +38,19 @@ const App = () => {
 
   const handlePersonFormSubmit = (e) => {
     e.preventDefault();
-    const foundPerson = persons.find((person) => person.name === newName);
     const newPerson = {
       name: newName,
       number: newNumber,
     };
-    if (foundPerson) {
-      const confirmNumberUpdate = window.confirm(
-        `${foundPerson.name} is already added to phonebook, replace the old number with a new one?`
-      );
-      if (confirmNumberUpdate) {
-        personServices
-          .update(foundPerson.id, newPerson)
-          .then((returnedPerson) => {
-            setPersons(
-              persons.map((person) =>
-                person.id !== returnedPerson.id ? person : returnedPerson
-              )
-            );
-            setNotification({
-              message: `${returnedPerson.name}'s number is successfully updated`,
-              type: 'success',
-            });
-            setTimeout(() => setNotification({}), 5000);
-          })
-          .catch((error) => {
-            setPersons(
-              persons.filter((person) => person.id !== foundPerson.id)
-            );
-            const errorMessage = `Information of ${foundPerson.name} has already been removed from server`;
-            console.log(errorMessage);
-            setNotification({
-              message: errorMessage,
-              type: 'error',
-            });
-            setTimeout(() => setNotification({}), 5000);
-          });
-        resetPersonFormState();
-      }
-    } else {
-      personServices.create(newPerson).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        resetPersonFormState();
-        setNotification({
-          message: `Added ${returnedPerson.name}`,
-          type: 'success',
-        });
-        setTimeout(() => setNotification({}), 5000);
+    personServices.create(newPerson).then((returnedPerson) => {
+      setPersons(persons.concat(returnedPerson));
+      resetPersonFormState();
+      setNotification({
+        message: `Added ${returnedPerson.name}`,
+        type: 'success',
       });
-    }
+      setTimeout(() => setNotification({}), 5000);
+    });
   };
 
   const handleDeletePerson = (id) => {
