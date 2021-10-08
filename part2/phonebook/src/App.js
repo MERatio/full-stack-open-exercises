@@ -63,13 +63,17 @@ const App = () => {
             setTimeout(() => setNotification({}), 5000);
           })
           .catch((error) => {
-            setPersons(
-              persons.filter((person) => person.id !== foundPerson.id)
-            );
-            const errorMessage = `Information of ${foundPerson.name} has already been removed from server`;
-            console.log(errorMessage);
+            if (
+              error.response.data.error ===
+              "Person's phonebook info is already deleted"
+            ) {
+              setPersons(
+                persons.filter((person) => person.id !== foundPerson.id)
+              );
+            }
+            console.log(error.response.data.error);
             setNotification({
-              message: errorMessage,
+              message: error.response.data.error,
               type: 'error',
             });
             setTimeout(() => setNotification({}), 5000);
@@ -77,21 +81,31 @@ const App = () => {
         resetPersonFormState();
       }
     } else {
-      personServices.create(newPerson).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        resetPersonFormState();
-        setNotification({
-          message: `Added ${returnedPerson.name}`,
-          type: 'success',
+      personServices
+        .create(newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          resetPersonFormState();
+          setNotification({
+            message: `Added ${returnedPerson.name}`,
+            type: 'success',
+          });
+          setTimeout(() => setNotification({}), 5000);
+        })
+        .catch((error) => {
+          console.log(error.response.data.error);
+          setNotification({
+            message: error.response.data.error,
+            type: 'error',
+          });
+          setTimeout(() => setNotification({}), 5000);
         });
-        setTimeout(() => setNotification({}), 5000);
-      });
     }
   };
 
   const handleDeletePerson = (id) => {
-    const person = persons.find((person) => person.id === id);
-    const confirmDeletion = window.confirm(`Delete ${person.name} ?`);
+    const foundPerson = persons.find((person) => person.id === id);
+    const confirmDeletion = window.confirm(`Delete ${foundPerson.name} ?`);
     if (confirmDeletion) {
       const personWithDeletedPerson = persons.filter(
         (person) => person.id !== id
@@ -102,11 +116,15 @@ const App = () => {
           setPersons(personWithDeletedPerson);
         })
         .catch((error) => {
-          setPersons(personWithDeletedPerson);
-          const errorMessage = `Information of ${person.name} has already been removed from server`;
-          console.log(errorMessage);
+          if (
+            error.response.data.error ===
+            "Person's phonebook info is already deleted"
+          ) {
+            setPersons(personWithDeletedPerson);
+          }
+          console.log(error.response.data.error);
           setNotification({
-            message: errorMessage,
+            message: error.response.data.error,
             type: 'error',
           });
           setTimeout(() => setNotification({}), 5000);
